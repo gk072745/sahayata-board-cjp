@@ -1,8 +1,8 @@
-app = "sahayata-board"
+app = "sahayata-board-cjp"
 primary_region = "bom"
 
 [build]
-  builder = "heroku/buildpacks:20"
+  dockerfile = "Dockerfile"
 
 [env]
   DATA_DIR = "/data"

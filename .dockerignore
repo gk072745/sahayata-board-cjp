@@ -1,0 +1,9 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+server/data/*.json
+data/*.json
+*.md
+.cursor
