@@ -13,15 +13,40 @@ jobs:
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Create Fly app if missing
-        run: flyctl apps create sahayata-board-cjp --org "${{ secrets.FLY_ORG }}" || true
+      - name: Check required secrets
+        run: |
+          if [ -z "${{ secrets.FLY_API_TOKEN }}" ]; then
+            echo "ERROR: FLY_API_TOKEN secret is missing in GitHub repo settings."
+            exit 1
+          fi
+          if [ -z "${{ secrets.FLY_ORG }}" ]; then
+            echo "ERROR: FLY_ORG secret is missing in GitHub repo settings."
+            exit 1
+          fi
+
+      - name: Verify Fly authentication
+        run: flyctl auth whoami
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
-      - name: Create Fly volume if missing
+      - name: Bootstrap Fly app and volume
         run: |
-          if ! flyctl volumes list -a sahayata-board-cjp | grep -q sahayata_data; then
-            flyctl volumes create sahayata_data --size 1 --region bom -a sahayata-board-cjp --yes
+          set -euo pipefail
+          APP="sahayata-board-cjp"
+          ORG="${{ secrets.FLY_ORG }}"
+
+          if ! flyctl apps list | grep -qw "$APP"; then
+            echo "Creating app $APP in org $ORG..."
+            flyctl apps create "$APP" --org "$ORG"
+          else
+            echo "App $APP already exists."
+          fi
+
+          if ! flyctl volumes list -a "$APP" | grep -q sahayata_data; then
+            echo "Creating volume sahayata_data in bom..."
+            flyctl volumes create sahayata_data --size 1 --region bom -a "$APP" --yes
+          else
+            echo "Volume sahayata_data already exists."
           fi
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
