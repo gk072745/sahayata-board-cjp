@@ -1,13 +1,14 @@
 services:
   - type: web
     name: sahayata-board-cjp
-    runtime: node
+    env: node
     plan: free
+    region: singapore
     buildCommand: npm run install:server
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
-        value: 22
+        value: 20
       - key: NODE_ENV
         value: production
