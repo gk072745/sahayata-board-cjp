@@ -85,24 +85,20 @@ The server serves both the API (`/api/*`) and the static frontend from the same 
 | POST | `/api/requests/:id/fulfill` | Yes | Mark fulfilled |
 | DELETE | `/api/requests/:id` | Yes | Delete your request |
 
-## Free deployment options
-
-Since this uses JSON file storage, deploy the **whole app** (server + static files) to a host with persistent disk:
-
-- **Render** free web service (with persistent disk if available)
-- **Railway** free tier
-- **Fly.io** with a small volume mounted at `/data`
-- **A small VPS** with Node.js
-
-Steps (generic):
+## Deploy on Render (recommended, free)
 
 1. Push this repo to GitHub
-2. Create a web service pointing to `server/src/index.js`
-3. Set start command: `npm start`
-4. Mount persistent storage to the `data/` folder so JSON files survive restarts
-5. Set `PORT` from the host environment (most hosts do this automatically)
+2. Go to [render.com](https://render.com) → **New +** → **Web Service**
+3. Connect repo `sahayata-board-cjp`
+4. Settings:
+   - **Build Command:** `npm run install:server`
+   - **Start Command:** `npm start`
+   - **Instance Type:** Free
+5. Click **Create Web Service**
 
-> Note: Serverless platforms like Vercel/Netlify Functions are not ideal here because JSON files need persistent writable storage. A single small Node server with a disk volume is the simplest free approach.
+Or use the included `render.yaml` blueprint from the Render dashboard.
+
+> Note: On Render free tier, data persists while the server is running but may reset on redeploy/restart. For a short protest event this is usually fine.
 
 ## Usage flow
 
