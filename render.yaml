@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: sahayata-board
+    name: sahayata-board-cjp
     runtime: node
     plan: free
     buildCommand: npm run install:server
@@ -9,3 +9,5 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22
+      - key: NODE_ENV
+        value: production
