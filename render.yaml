@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: sahayata-board
+    runtime: node
+    plan: free
+    buildCommand: npm run install:server
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
