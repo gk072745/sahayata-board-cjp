@@ -20,6 +20,11 @@
       </div>
     </header>
 
+    <nav id="tabs-nav" class="tabs">
+      <button class="tab active" data-tab="board" type="button">Board</button>
+      <button class="tab" data-tab="mine" type="button">My Request</button>
+    </nav>
+
     <main>
       <section id="board-panel" class="panel active">
         <div id="board-status" class="status-bar"></div>
@@ -29,7 +34,6 @@
 
       <section id="mine-panel" class="panel">
         <div id="login-section" class="card">
-          <button id="back-to-board-btn" class="btn btn-secondary btn-block" type="button">Back to Board</button>
           <h2>Login to post a request</h2>
           <p class="hint">First time? Enter a username and password — your account is created automatically.</p>
           <form id="login-form">

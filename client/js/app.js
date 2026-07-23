@@ -104,9 +104,10 @@ const mineContent = document.getElementById("mine-content");
 const loggedInUser = document.getElementById("logged-in-user");
 const boardPanel = document.getElementById("board-panel");
 const minePanel = document.getElementById("mine-panel");
+const tabsNav = document.getElementById("tabs-nav");
 const bottomBar = document.querySelector(".bottom-bar");
 
-let guestView = "board";
+let guestTab = "board";
 let refreshTimer = null;
 
 function typeMeta(type) {
@@ -141,6 +142,7 @@ function updateLayout() {
   document.body.classList.toggle("logged-in", Boolean(session));
 
   if (session) {
+    tabsNav.classList.add("hidden");
     boardPanel.classList.remove("active");
     minePanel.classList.add("active");
     bottomBar.classList.add("hidden");
@@ -150,30 +152,29 @@ function updateLayout() {
     return;
   }
 
+  tabsNav.classList.remove("hidden");
   mineDashboard.classList.add("hidden");
-  bottomBar.classList.remove("hidden");
+  bottomBar.classList.add("hidden");
+  loginSection.classList.remove("hidden");
+  switchGuestTab(guestTab);
+}
 
-  if (guestView === "login") {
-    boardPanel.classList.remove("active");
-    minePanel.classList.add("active");
-    loginSection.classList.remove("hidden");
-    return;
-  }
-
-  boardPanel.classList.add("active");
-  minePanel.classList.remove("active");
-  loginSection.classList.add("hidden");
+function switchGuestTab(tab) {
+  guestTab = tab;
+  document.querySelectorAll(".tab").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.tab === tab);
+  });
+  boardPanel.classList.toggle("active", tab === "board");
+  minePanel.classList.toggle("active", tab === "mine");
+  if (tab === "board") loadBoard();
 }
 
 function showGuestBoard() {
-  guestView = "board";
-  updateLayout();
-  loadBoard();
+  switchGuestTab("board");
 }
 
 function showGuestLogin() {
-  guestView = "login";
-  updateLayout();
+  switchGuestTab("mine");
 }
 
 function helperLabel(count) {
@@ -491,6 +492,13 @@ async function renderMinePanel() {
   await renderMineList();
 }
 
+document.querySelectorAll(".tab").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (getSession()) return;
+    switchGuestTab(btn.dataset.tab);
+  });
+});
+
 document.getElementById("refresh-btn").addEventListener("click", () => {
   if (getSession()) {
     renderMineList();
@@ -504,8 +512,6 @@ document.getElementById("guidelines-btn").addEventListener("click", openGuidelin
 document.getElementById("guidelines-modal").addEventListener("click", (event) => {
   if (event.target.dataset.closeGuidelines === "true") closeGuidelines();
 });
-
-document.getElementById("back-to-board-btn").addEventListener("click", showGuestBoard);
 
 document.getElementById("post-request-btn").addEventListener("click", () => {
   if (getSession()) {
@@ -525,6 +531,7 @@ document.getElementById("login-form").addEventListener("submit", async (event) =
     await api.login(username, password);
     saveSession({ username, password });
     showToast("Logged in");
+    updateLayout();
     await renderMineList();
   } catch (err) {
     showToast(err.message);
@@ -533,7 +540,7 @@ document.getElementById("login-form").addEventListener("submit", async (event) =
 
 document.getElementById("logout-btn").addEventListener("click", () => {
   clearSession();
-  showGuestBoard();
+  updateLayout();
   showToast("Logged out");
 });
 
@@ -542,12 +549,13 @@ detailModal.addEventListener("click", (event) => {
 });
 
 if (getSession()) {
+  updateLayout();
   renderMineList();
 } else {
-  showGuestBoard();
+  updateLayout();
 }
 refreshTimer = setInterval(() => {
-  if (!getSession() && guestView === "board" && detailModal.classList.contains("hidden")) {
+  if (!getSession() && guestTab === "board" && detailModal.classList.contains("hidden")) {
     loadBoard();
   }
 }, 45000);
